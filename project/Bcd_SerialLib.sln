@@ -1,0 +1,29 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 10.00
+# Visual Studio 2008
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Bcd_SerialDll", "Bcd_SerialDll\Bcd_SerialDll.vcproj", "{BBCFBAD5-D796-4833-AA02-30214B6A8518}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Bcd_SerialDllDemo", "Bcd_SerialDllDemo\Bcd_SerialDllDemo.vcproj", "{8BC2E4B9-EBB4-43E0-8B7D-2BAF3A78BF44}"
+	ProjectSection(ProjectDependencies) = postProject
+		{BBCFBAD5-D796-4833-AA02-30214B6A8518} = {BBCFBAD5-D796-4833-AA02-30214B6A8518}
+	EndProjectSection
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Win32 = Debug|Win32
+		Release|Win32 = Release|Win32
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{BBCFBAD5-D796-4833-AA02-30214B6A8518}.Debug|Win32.ActiveCfg = Debug|Win32
+		{BBCFBAD5-D796-4833-AA02-30214B6A8518}.Debug|Win32.Build.0 = Debug|Win32
+		{BBCFBAD5-D796-4833-AA02-30214B6A8518}.Release|Win32.ActiveCfg = Release|Win32
+		{BBCFBAD5-D796-4833-AA02-30214B6A8518}.Release|Win32.Build.0 = Release|Win32
+		{8BC2E4B9-EBB4-43E0-8B7D-2BAF3A78BF44}.Debug|Win32.ActiveCfg = Debug|Win32
+		{8BC2E4B9-EBB4-43E0-8B7D-2BAF3A78BF44}.Debug|Win32.Build.0 = Debug|Win32
+		{8BC2E4B9-EBB4-43E0-8B7D-2BAF3A78BF44}.Release|Win32.ActiveCfg = Release|Win32
+		{8BC2E4B9-EBB4-43E0-8B7D-2BAF3A78BF44}.Release|Win32.Build.0 = Release|Win32
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal
