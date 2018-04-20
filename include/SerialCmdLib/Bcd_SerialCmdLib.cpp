@@ -65,6 +65,39 @@ BCD_SERIALDLL_API int __stdcall BCD_SRL_RigisterReadCallBack(IN void * handle, I
     return pcSrlProc->SrlSetReadCallBackFunc(pFunc, pUser);
 }
 
+BCD_SERIALDLL_API int __stdcall BCD_SRL_SetRecvTimeSpan(IN void * handle, IN const unsigned int nRecvTimeSpan)
+{
+	if (NULL == handle)
+	{
+		return SRL_RET_RES;
+	}
+
+	SerialCmdProc * pcSrlProc = (SerialCmdProc *)handle;
+	return pcSrlProc->SrlSetRecvTimeSpan(nRecvTimeSpan);
+}
+
+BCD_SERIALDLL_API int __stdcall BCD_SRL_StartReading(IN void * handle, IN const unsigned int nRecvTimeSpan)
+{
+	if (NULL == handle)
+	{
+		return SRL_RET_RES;
+	}
+
+	SerialCmdProc * pcSrlProc = (SerialCmdProc *)handle;
+	return pcSrlProc->SrlStartRecving(nRecvTimeSpan);
+}
+
+BCD_SERIALDLL_API int __stdcall BCD_SRL_StartReading(IN void * handle)
+{
+	if (NULL == handle)
+	{
+		return SRL_RET_RES;
+	}
+
+	SerialCmdProc * pcSrlProc = (SerialCmdProc *)handle;
+	return pcSrlProc->SrlStopRecving();
+}
+
 BCD_SERIALDLL_API int __stdcall BCD_SRL_DestoryHandle(IN void * handle)
 {
     if (NULL == handle)

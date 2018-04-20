@@ -10,6 +10,9 @@
 #define SRL_RET_PARAM     (-5)    // 设置串口参数失败
 #define SRL_RET_NODATA    (-6)    // 无串口数据
 
+const unsigned int RECV_TIME_SPAN = 32;    // 连续接收模式下，默认的串口接收间隔时间
+const unsigned int MAX_RECV_LEN   = 1024;    // 串口一次接收数据的最大值
+
 typedef struct _SERIAL_INFO_
 {
     // 串口相关信息

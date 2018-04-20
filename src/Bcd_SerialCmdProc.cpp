@@ -35,6 +35,7 @@
 **************************************************************/
 
 #include <iostream>
+#include <process.h>  
 #include "Bcd_SerialCmdProc.h"
 
 using namespace std;
@@ -63,11 +64,28 @@ inline static void MyDbgView(const char * format, ...)
     return;
 }
 
+unsigned int __stdcall StartRecvingThread(void * pUser)
+{
+	if (NULL != pUser)
+	{
+		SerialCmdProc * pThis = (SerialCmdProc *)pUser;
+		pThis->StartRecvingProc();
+	}
+
+	_endthreadex(0);
+	return 1;
+}
+
 SerialCmdProc::SerialCmdProc()
 {
     m_pcSerial = NULL;
     m_pSrlReadCbFunc = NULL;
     m_pSrlCbUser = NULL;
+
+	m_bIsCtnReading = FALSE;
+	m_hCtnReadHandle = NULL;
+	m_bIsThreadExit = FALSE;
+	m_nRecvTimeSpan = RECV_TIME_SPAN;
 }
 
 SerialCmdProc::~SerialCmdProc()
@@ -108,6 +126,8 @@ int SerialCmdProc::SrlInit(const BCD_SERIAL_INFO * pstSeriallInfo)
 
 int SerialCmdProc::SrlDeinit()
 {
+	CloseCtnRecvingThread();
+
     if (NULL != m_pcSerial)
     {
         m_pcSerial->Close();
@@ -115,6 +135,7 @@ int SerialCmdProc::SrlDeinit()
         m_pcSerial = NULL;
     }
 
+	m_bIsCtnReading = FALSE;
     m_pSrlReadCbFunc = NULL;
     m_pSrlCbUser = NULL;
 
@@ -257,6 +278,12 @@ int SerialCmdProc::SrlRecvInfo(char * strInfo, const unsigned int nBufLen, unsig
         return SRL_RET_RES;
     }
 
+	if (TRUE == m_bIsCtnReading)
+	{
+		MyDbgView("[SrlLib] SrlRecvInfo is in CtnReading status.");
+		return SRL_RET_ERR;
+	}
+
     memset(strInfo, 0, nBufLen);
     int nRet = SRL_RET_OK;
     long lRet = m_pcSerial->Read(strInfo, nBufLen, (DWORD *)&nRecvLen);
@@ -292,11 +319,102 @@ int SerialCmdProc::SrlSetReadCallBackFunc(SRL_ReadCallBackFunc pFunc, void * pUs
     if (NULL == pFunc)
     {
         MyDbgView("[SrlLib] SrlSetReadCallBackFunc pFunc is null.");
-        return SRL_RET_ERR;
+        return SRL_RET_RES;
     }
 
     m_pSrlReadCbFunc = pFunc;
     m_pSrlCbUser = pUser;
 
     return SRL_RET_OK;
+}
+
+int SerialCmdProc::SrlStartRecving(const unsigned int nRecvTimeSpan)
+{
+	/* nRecvSpan 是相邻两次读取串口信息的间隔时间（单位为ms） */
+	if (NULL == m_pcSerial)
+	{
+		MyDbgView("[SrlLib] SrlStartRecving m_pcSerial is null.");
+		return SRL_RET_RES;
+	}
+
+	int nRet = SRL_RET_OK;
+	if (NULL == m_hCtnReadHandle)
+	{
+		m_bIsThreadExit = FALSE;
+		m_nRecvTimeSpan = nRecvTimeSpan;
+		m_bIsCtnReading = TRUE;
+		m_hCtnReadHandle = (void *)_beginthreadex(NULL, 0, StartRecvingThread, this, 0, NULL);
+		if (NULL == m_hCtnReadHandle)
+		{
+			MyDbgView("[SrlLib] SrlStartRecving create thread failed.");
+			nRet = SRL_RET_RES;
+		}
+	}
+	else
+	{
+		MyDbgView("[SrlLib] SrlStartRecving m_hCtnReadHandle is not null.");
+		nRet = SRL_RET_RES;
+	}
+
+	return nRet;
+}
+
+void SerialCmdProc::StartRecvingProc()
+{
+	if (NULL == m_pcSerial)
+	{
+		MyDbgView("[SrlLib] StartRecvingProc m_pcSerial is null.");
+		return;
+	}
+
+	char strInfo[MAX_RECV_LEN] = {0};
+	DWORD nRecvLen = 0;
+	long lRet = ERROR_SUCCESS;
+
+	while (FALSE == m_bIsThreadExit)
+	{
+		Sleep(m_nRecvTimeSpan);
+
+		// 开始持续读取串口信息，然后通过设置回调，来进行处理
+		memset(strInfo, 0, MAX_RECV_LEN);
+		nRecvLen = 0;
+		lRet = m_pcSerial->Read(strInfo, MAX_RECV_LEN, (DWORD *)&nRecvLen);
+		if (ERROR_SUCCESS == lRet && nRecvLen > 0)
+		{
+			strInfo[nRecvLen] = '\0';
+			MyDbgView("[SrlLib] serial continue recv info : [%s].", strInfo);
+			if (NULL != m_pSrlReadCbFunc)
+			{
+				m_pSrlReadCbFunc((void *)strInfo, m_pSrlCbUser);
+			}
+		}
+	}
+
+	return;
+}
+
+void SerialCmdProc::CloseCtnRecvingThread()
+{
+	m_bIsThreadExit = TRUE;
+	if (NULL != m_hCtnReadHandle)
+	{
+		WaitForSingleObject(m_hCtnReadHandle, INFINITE);
+		CloseHandle(m_hCtnReadHandle);
+		m_hCtnReadHandle = NULL;
+	}
+
+	return;
+}
+
+int SerialCmdProc::SrlSetRecvTimeSpan(const unsigned int nRecvTimeSpan)
+{
+	m_nRecvTimeSpan = nRecvTimeSpan;
+	return SRL_RET_OK;
+}
+
+int SerialCmdProc::SrlStopRecving()
+{
+	CloseCtnRecvingThread();
+
+	return SRL_RET_OK;
 }

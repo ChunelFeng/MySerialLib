@@ -52,6 +52,15 @@ BCD_SERIALDLL_API int __stdcall BCD_SRL_Read(IN void * handle, OUT char * strInf
 // 注册读取串口后信息的回调函数
 BCD_SERIALDLL_API int __stdcall BCD_SRL_RigisterReadCallBack(IN void * handle, IN SRL_ReadCallBackFunc pFunc, IN void * pUser);
 
+// 连续模式下，设置相邻两次串口读取间隔时间，单位为ms
+BCD_SERIALDLL_API int __stdcall BCD_SRL_SetRecvTimeSpan(IN void * handle, IN const unsigned int nRecvTimeSpan);
+
+// 开启连续读取模式
+BCD_SERIALDLL_API int __stdcall BCD_SRL_StartReading(IN void * handle, IN const unsigned int nRecvTimeSpan);
+
+// 停止连续读取模式
+BCD_SERIALDLL_API int __stdcall BCD_SRL_StopReading(IN void * handle);
+
 // 销毁串口句柄，释放相应资源
 BCD_SERIALDLL_API int __stdcall BCD_SRL_DestoryHandle(IN void * handle);
 

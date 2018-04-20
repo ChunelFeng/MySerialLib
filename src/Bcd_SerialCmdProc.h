@@ -31,7 +31,6 @@
 *
 * ━━━━━━感觉萌萌哒━━━━━━
 */
-
 #ifndef _BCD_SERIAL_CMD_PROC_H_
 #define _BCD_SERIAL_CMD_PROC_H_
 
@@ -42,23 +41,37 @@
 class SerialCmdProc
 {
 public:
-    SerialCmdProc();
+    explicit SerialCmdProc();
     virtual ~SerialCmdProc();
 
+	/* 对外提供的接口函数的内部实现 */
     int SrlInit(const BCD_SERIAL_INFO * pstSeriallInfo);
     int SrlDeinit();
+
     int SrlSendInfo(const char * strInfo);
     int SrlRecvInfo(char * strInfo, const unsigned int nBufLen, unsigned int & nRecvLen);
     int SrlSetReadCallBackFunc(SRL_ReadCallBackFunc pFunc, void * pUser);
+	int SrlStartRecving(const unsigned int nRecvTimeSpan);
+	int SrlStopRecving();
+	int SrlSetRecvTimeSpan(const unsigned int nRecvTimeSpan);
+
+	/* 线程处理函数 */
+	void StartRecvingProc();
 
 protected:
-    int OpenSerial(const BCD_SERIAL_INFO * pstSeriallInfo);
-    int CloseSerial();
+    int  OpenSerial(const BCD_SERIAL_INFO * pstSeriallInfo);
+    int  CloseSerial();
+	void CloseCtnRecvingThread();
 
 private:
     CSerial                   * m_pcSerial;
     SRL_ReadCallBackFunc      m_pSrlReadCbFunc;
     void                      * m_pSrlCbUser;
+
+	BOOL                      m_bIsCtnReading;    // 判断是否是连续读取状态
+	void                      * m_hCtnReadHandle;    // 连续读取线程
+	BOOL                      m_bIsThreadExit;
+	unsigned int              m_nRecvTimeSpan;    // 相邻两次串口信息接收时间
 };
 
 #endif
