@@ -87,7 +87,7 @@ BCD_SERIALDLL_API int __stdcall BCD_SRL_StartReading(IN void * handle, IN const 
 	return pcSrlProc->SrlStartRecving(nRecvTimeSpan);
 }
 
-BCD_SERIALDLL_API int __stdcall BCD_SRL_StartReading(IN void * handle)
+BCD_SERIALDLL_API int __stdcall BCD_SRL_StopReading(IN void * handle)
 {
 	if (NULL == handle)
 	{
