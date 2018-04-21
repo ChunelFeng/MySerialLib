@@ -1,11 +1,13 @@
-# <center> 物流读码组Serial库使用说明 </center>
+# <center> Serial库使用说明 </center>
 
 ## 1. 简介
+
 &ensp;&ensp;&ensp;&ensp; 本文主要介绍了Bcd_SerialLib动态库的相关接口和使用说明，旨在让大家更方便的使用串口通信相关功能。目标读者是需要使用串口通信编程的开发或者测试人员。
 
 ## 2. 相关信息定义
+
 ```cpp
-/* 串口相关信息 */ 
+/* 串口相关信息 */
 typedef struct _BCD_SERIAL_INFO_
 {
     unsigned int nComNum;               // 端口号
@@ -34,9 +36,10 @@ typedef void (__stdcall * SRL_ReadCallBackFunc)(void * pInfo, void * pUser);
 ```
 
 ## 3. 相关接口定义
+
 ```cpp
 /************************************************************************
- *  @fn     BCD_SRL_GetLibVersion()
+ *  @fn     BCD_SRL_GetLibVersion
  *  @brief  获取版本信息
  *  @param  无
  *  @return 返回串口库版本信息
@@ -44,7 +47,7 @@ typedef void (__stdcall * SRL_ReadCallBackFunc)(void * pInfo, void * pUser);
 BCD_SERIALDLL_API unsigned int __stdcall BCD_SRL_GetLibVersion();
 
 /************************************************************************
- *  @fn     BCD_SRL_CreateHandle()
+ *  @fn     BCD_SRL_CreateHandle
  *  @brief  创建串口对应句柄
  *  @param  handle                    [OUT]         待创建的串口句柄
  *  @param  pstSerialInfo             [IN]          待创建的串口信息
@@ -54,19 +57,19 @@ BCD_SERIALDLL_API int __stdcall BCD_SRL_CreateHandle(OUT void ** handle,
                                 IN const BCD_SERIAL_INFO * pstSerialInfo);
 
 /************************************************************************
- *  @fn     BCD_SRL_Write()
+ *  @fn     BCD_SRL_Write
  *  @brief  向串口写入信息
  *  @param  handle                    [IN]          对应的句柄
  *  @param  strInfo                   [IN]          写入串口的信息
- *  @param  nLen                      [IN]          写入信息的长度
+ *  @param  nBufLen                   [IN]          写入信息的长度
  *  @return 成功，返回SRL_RET_OK；失败，见错误返回值
  ************************************************************************/
 BCD_SERIALDLL_API int __stdcall BCD_SRL_Write(IN void * handle,
                                 IN const char * strInfo,
-                                IN const unsigned int nLen);
+                                IN const unsigned int nBufLen);
 
 /************************************************************************
- *  @fn     BCD_SRL_Read()
+ *  @fn     BCD_SRL_Read
  *  @brief  从串口中读取信息
  *  @param  handle                    [IN]          对应的句柄
  *  @param  strInfo                   [OUT]         读取串口数据
@@ -80,7 +83,7 @@ BCD_SERIALDLL_API int __stdcall BCD_SRL_Read(IN void * handle,
                                 OUT unsigned int & nRecvLen);
 
 /************************************************************************
- *  @fn     BCD_SRL_ReadBlock()
+ *  @fn     BCD_SRL_ReadBlock
  *  @brief  从串口中读取确定长度的信息
  *  @param  handle                    [IN]          对应的句柄
  *  @param  nBlockLen                 [IN]          设定的报文块大小
@@ -94,7 +97,7 @@ BCD_SERIALDLL_API int __stdcall BCD_SRL_ReadBlock(IN void * handle,
                                 IN const unsigned int nBufLen);
 
 /************************************************************************
- *  @fn     BCD_SRL_RigisterReadCallBack()
+ *  @fn     BCD_SRL_RigisterReadCallBack
  *  @brief  注册读取串口后信息的回调函数
  *  @param  handle                    [IN]          对应的句柄
  *  @param  pFunc                     [IN]          注册读取回调函数（可为NULL）
@@ -106,7 +109,33 @@ BCD_SERIALDLL_API int __stdcall BCD_SRL_RigisterReadCallBack(IN void * handle,
                                 IN void * pUser);
 
 /************************************************************************
- *  @fn     BCD_SRL_GetSerialInfo()
+ *  @fn     BCD_SRL_SetRecvTimeSpan
+ *  @brief  设置持续读取模式下，串口读取信息时间间隔，单位为ms
+ *  @param  handle                    [IN]          对应的句柄
+ *  @param  nRecvTimeSpan             [IN]          相邻两次读取时间间隔
+ *  @return 成功，返回SRL_RET_OK；失败，见错误返回值
+ ************************************************************************/
+BCD_SERIALDLL_API int __stdcall BCD_SRL_SetRecvTimeSpan(IN void * handle,
+                                IN const unsigned int nRecvTimeSpan);
+
+/************************************************************************
+ *  @fn     BCD_SRL_StartReading
+ *  @brief  开启连续读取模式
+ *  @param  handle                    [IN]          对应的句柄
+ *  @return 成功，返回SRL_RET_OK；失败，见错误返回值
+ ************************************************************************/
+BCD_SERIALDLL_API int __stdcall BCD_SRL_StartReading(IN void * handle);
+
+/************************************************************************
+ *  @fn     BCD_SRL_StopReading
+ *  @brief  停止连续读取模式，详见【补充说明】
+ *  @param  handle                    [IN]          对应的句柄
+ *  @return 成功，返回SRL_RET_OK；失败，见错误返回值
+ ************************************************************************/
+BCD_SERIALDLL_API int __stdcall BCD_SRL_StopReading(IN void * handle);
+
+/************************************************************************
+ *  @fn     BCD_SRL_GetSerialInfo
  *  @brief  获取串口设置信息
  *  @param  handle                    [IN]          对应的句柄
  *  @param  pstSerialInfo             [OUT]         获取对应的串口信息
@@ -116,17 +145,17 @@ BCD_SERIALDLL_API int __stdcall BCD_SRL_GetSerialInfo(IN void * handle,
                                 OUT BCD_SERIAL_INFO * pstSerialInfo);
 
 /************************************************************************
- *  @fn     BCD_SRL_DestoryHandle()
+ *  @fn     BCD_SRL_DestoryHandle
  *  @brief  销毁串口句柄，释放相应资源
- *  @param  无
+ *  @param  handle                    [IN]          对应的句柄
  *  @return 成功，返回SRL_RET_OK；失败，见错误返回值
  ************************************************************************/
 BCD_SERIALDLL_API int __stdcall BCD_SRL_DestoryHandle(IN void * handle);
 ```
 
 ## 4. 使用Demo
-```cpp
 
+```cpp
 #include <iostream>
 #include <Windows.h>
 #include "Bcd_SerialCmdLib.h"
@@ -214,10 +243,15 @@ void main()
 ```
 
 ## 5. 补充说明
-&ensp;&ensp;&ensp;&ensp; 读取注册回调函数在串口读取信息的情况下被触发。如无需要，可以不设置。
+
+* 读取注册回调函数在串口读取信息的情况下被触发。如无需要，可以不设置。
+* BCD_SRL_StartReading函数调用后，无法调用BCD_SRL_Read函数和BCD_SRL_ReadBlock函数。
+* BCD_SRL_StopReading函数调用后，停止本动态库停止解析串口信息，但是该串口依然被占用。如果在此期间，串口有接受到数据，再次调用BCD_SRL_StartReading函数后，累积数据会被解析。
 
 ## 6. 版本信息
-| 序号 | 变更时间 | 版本信息 | 变更人员 | 变更说明  
-| - | :-: | -: |  -: |  -: |  -: |  -: 
+
+| 序号 | 变更时间 | 版本信息 | 变更人员 | 变更说明
+| - | :-: | -: |  -: |  -: |  -: |  -:
 | 1 | 2018.01.15 | v1.0.0 | Chunel | 新建
-| 2 | 2018.03.15 | v1.0.3 | Chunel | 添加了获取  版本信息的接口
+| 2 | 2018.03.15 | v1.0.3 | Chunel | 添加了获取版本信息的接口
+| 3 | 2018.04.21 | v1.1.0 | Chunel | 增加了连续读取功能
