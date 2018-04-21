@@ -9,11 +9,9 @@
 #define SRL_RET_TWICE     (-4)    // 重复调用
 #define SRL_RET_PARAM     (-5)    // 设置串口参数失败
 #define SRL_RET_NODATA    (-6)    // 无串口数据
+#define SRL_RET_BUFLEN    (-7)    // 缓存数据长度超过最大缓存长度(1024)
 
-const unsigned int RECV_TIME_SPAN = 32;    // 连续接收模式下，默认的串口接收间隔时间
-const unsigned int MAX_RECV_LEN   = 1024;    // 串口一次接收数据的最大值
-
-typedef struct _SERIAL_INFO_
+typedef struct _BCD_SERIAL_INFO_
 {
     // 串口相关信息
     unsigned int nComNum;               // 端口号
