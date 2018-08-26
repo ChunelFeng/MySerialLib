@@ -8,7 +8,7 @@ static void * g_hSerial = NULL;    // 全局串口句柄，用于串口句柄的读写
 
 void __stdcall SerialReadCallBack(void * pInfo, void * pUser)
 {
-    // 回调函数。如果接收到的串口信息长度大于3，则回复"Please write your message."信息
+    // 回调函数。如果接收到的串口信息长度大于3，则回复"Hello, serial."信息
     if (strlen((char *)pInfo) >= 3)
     {
         BCD_SRL_Write(g_hSerial, "Hello, serial.", strlen("Hello, serial.") + 1);
@@ -42,7 +42,7 @@ void main()
         Sleep(3000);
         return;
     }
-    cout << "BCD_SRL_CreateHandle succ..." << endl;
+    cout << "BCD_SRL_CreateHandle success..." << endl;
 
     // 设置串口读取信息时的回调函数（如无需回调，可省略）
     nRet = BCD_SRL_RigisterReadCallBack(g_hSerial, SerialReadCallBack, NULL);
@@ -52,10 +52,9 @@ void main()
         Sleep(3000);
         return;
     }
-    cout << "BCD_SRL_RigisterReadCallBack succ..." << endl;
+    cout << "BCD_SRL_RigisterReadCallBack success..." << endl;
 
     // 持续读取串口信息
-#if 0
     while (1)
     {
         Sleep(10);
@@ -66,30 +65,6 @@ void main()
             cout << "Serial recv : " << strRecvInfo << endl;
         }
     }
-#endif
-
-    while (1)
-    {
-        Sleep(10);
-        int i = 0;
-        cout << "please enter a num : ";
-        cin >> i;
-        nRet = BCD_SRL_StartReading(g_hSerial);
-        if (nRet != SRL_RET_OK)
-        {
-            cout << "BCD_SRL_StartReading failed..." << endl;
-            Sleep(3000);
-            return;
-        }
-        else
-        {
-            cout << "BCD_SRL_StartReading succ..." << endl;
-            Sleep(10000);
-            BCD_SRL_StopReading(g_hSerial);
-            cout << "****Stop, please enter a char..." << endl;
-        }
-    }
-    Sleep(2000);
 
     BCD_SRL_DestoryHandle(g_hSerial);
 
